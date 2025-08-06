@@ -6,7 +6,6 @@
     <title>Shadow Games Analytics - Dashboard Empresarial</title>
     <meta name="description" content="Análise completa de performance e mercado - Shadow Games Studio">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css" rel="stylesheet">
     <link rel="stylesheet" href="analytics-style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
 </head>
@@ -77,7 +76,7 @@
             <div class="overview-grid">
                 <div class="chart-card">
                     <h3>Downloads por Plataforma</h3>
-                    <canvas id="platformChart"></canvas>
+                    <canvas id="platformChart" width="400" height="400"></canvas>
                     <div class="chart-legend">
                         <div class="legend-item">
                             <span class="legend-color steam"></span>
@@ -100,7 +99,7 @@
                 
                 <div class="chart-card">
                     <h3>Crescimento Temporal</h3>
-                    <canvas id="timelineChart"></canvas>
+                    <canvas id="timelineChart" width="400" height="400"></canvas>
                 </div>
                 
                 <div class="metrics-card">
@@ -169,7 +168,7 @@
                     <h3>Timing Estratégico</h3>
                     <div class="timing-factors">
                         <div class="timing-item">
-                            <i class="fas fa-pumpkin-carved"></i>
+                            <i class="fas fa-ghost"></i>
                             <span>Lançamento em Outubro (Halloween)</span>
                             <span class="boost">+300% engagement</span>
                         </div>
