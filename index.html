@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Games Analytics - Dashboard Empresarial</title>
+    <meta name="description" content="Análise completa de performance e mercado - Shadow Games Studio">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="analytics-style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <span>Shadow Games Analytics</span>
+            </div>
+            <div class="nav-links">
+                <a href="#overview">Overview</a>
+                <a href="#defense">Nossa Defesa</a>
+                <a href="#market-analysis">Análise de Mercado</a>
+                <a href="#competitor-review">Análise Competitiva</a>
+            </div>
+            <div class="header-actions">
+                <button class="export-btn" onclick="exportReport()">
+                    <i class="fas fa-download"></i>
+                    Exportar Relatório
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="title-main">EXORCISMO: RITUAL FINAL</span>
+                <span class="title-sub">Analytics Dashboard</span>
+            </h1>
+            <p class="hero-description">
+                Análise completa de performance empresarial e resposta a questionamentos de mercado
+            </p>
+            
+            <div class="hero-stats">
+                <div class="stat success">
+                    <i class="fas fa-download"></i>
+                    <span class="stat-value" id="totalDownloads">2.847.392</span>
+                    <span class="stat-label">Downloads Totais</span>
+                </div>
+                <div class="stat success">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span class="stat-value" id="totalRevenue">R$ 8.2M</span>
+                    <span class="stat-label">Receita Bruta</span>
+                </div>
+                <div class="stat success">
+                    <i class="fas fa-globe"></i>
+                    <span class="stat-value">190</span>
+                    <span class="stat-label">Países</span>
+                </div>
+                <div class="stat success">
+                    <i class="fas fa-percentage"></i>
+                    <span class="stat-value">164%</span>
+                    <span class="stat-label">ROI</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Overview Section -->
+    <section class="overview-section" id="overview">
+        <div class="container">
+            <h2 class="section-title">Visão Geral - 2 Meses de Mercado</h2>
+            
+            <div class="overview-grid">
+                <div class="chart-card">
+                    <h3>Downloads por Plataforma</h3>
+                    <canvas id="platformChart"></canvas>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-color steam"></span>
+                            <span>Steam: 1.2M (42%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color playstation"></span>
+                            <span>PlayStation: 847K (30%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color xbox"></span>
+                            <span>Xbox: 625K (22%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color mobile"></span>
+                            <span>Mobile: 175K (6%)</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <h3>Crescimento Temporal</h3>
+                    <canvas id="timelineChart"></canvas>
+                </div>
+                
+                <div class="metrics-card">
+                    <h3>Métricas Chave</h3>
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-value">15.7%</div>
+                            <div class="metric-label">Conversão Demo → Compra</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">4.8/5</div>
+                            <div class="metric-label">Rating Médio</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">89.2%</div>
+                            <div class="metric-label">Reviews Positivas</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">67.3%</div>
+                            <div class="metric-label">Taxa de Retenção</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Defense Section -->
+    <section class="defense-section" id="defense">
+        <div class="container">
+            <h2 class="section-title">Nossa Defesa: Legitimidade dos Números</h2>
+            
+            <div class="defense-grid">
+                <div class="defense-card">
+                    <div class="defense-icon">
+                        <i class="fas fa-globe-americas"></i>
+                    </div>
+                    <h3>Alcance Multiplataforma</h3>
+                    <div class="defense-stats">
+                        <div class="platform-reach">
+                            <span class="platform-name">Steam</span>
+                            <span class="platform-users">132M usuários ativos</span>
+                        </div>
+                        <div class="platform-reach">
+                            <span class="platform-name">PlayStation</span>
+                            <span class="platform-users">108M usuários ativos</span>
+                        </div>
+                        <div class="platform-reach">
+                            <span class="platform-name">Xbox</span>
+                            <span class="platform-users">120M usuários ativos</span>
+                        </div>
+                        <div class="platform-reach">
+                            <span class="platform-name">Mobile</span>
+                            <span class="platform-users">2.6B usuários globais</span>
+                        </div>
+                    </div>
+                    <p class="defense-conclusion">
+                        <strong>Total: 360M+ usuários simultâneos.</strong> Nossos 2.8M downloads representam apenas <span class="highlight">0.78%</span> do alcance total.
+                    </p>
+                </div>
+                
+                <div class="defense-card">
+                    <div class="defense-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3>Timing Estratégico</h3>
+                    <div class="timing-factors">
+                        <div class="timing-item">
+                            <i class="fas fa-pumpkin-carved"></i>
+                            <span>Lançamento em Outubro (Halloween)</span>
+                            <span class="boost">+300% engagement</span>
+                        </div>
+                        <div class="timing-item">
+                            <i class="fas fa-film"></i>
+                            <span>Filmes de Terror em Alta (Talk to Me, The Nun II)</span>
+                            <span class="boost">+180% interesse</span>
+                        </div>
+                        <div class="timing-item">
+                            <i class="fas fa-gamepad"></i>
+                            <span>Demo Gratuita Viral</span>
+                            <span class="boost">5.2M downloads</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="defense-card">
+                    <div class="defense-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Comparação de Mercado</h3>
+                    <div class="comparison-chart">
+                        <div class="comparison-item">
+                            <span class="game-name">Phasmophobia</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                            <span class="game-stats">10M em 3 meses</span>
+                        </div>
+                        <div class="comparison-item">
+                            <span class="game-name">Among Us</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                            <span class="game-stats">500M em 4 meses</span>
+                        </div>
+                        <div class="comparison-item">
+                            <span class="game-name">Fall Guys</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                            <span class="game-stats">100M em 2 meses</span>
+                        </div>
+                        <div class="comparison-item highlight-our">
+                            <span class="game-name">Exorcismo: Ritual Final</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill our-game" style="width: 28%"></div>
+                            </div>
+                            <span class="game-stats">2.8M em 2 meses</span>
+                        </div>
+                    </div>
+                    <p class="defense-conclusion">
+                        Nossos números são <strong>conservadores</strong> comparado a outros sucessos indie multiplataforma.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Market Analysis Section -->
+    <section class="market-section" id="market-analysis">
+        <div class="container">
+            <h2 class="section-title">Análise de Mercado: Digital vs Físico</h2>
+            
+            <div class="market-comparison">
+                <div class="comparison-side digital">
+                    <h3>
+                        <i class="fas fa-cloud-download-alt"></i>
+                        Produto Digital (Nosso Jogo)
+                    </h3>
+                    <div class="advantages">
+                        <div class="advantage">
+                            <i class="fas fa-infinity"></i>
+                            <div>
+                                <strong>Escalabilidade Infinita</strong>
+                                <p>Replicação instantânea sem custo adicional</p>
+                            </div>
+                        </div>
+                        <div class="advantage">
+                            <i class="fas fa-globe"></i>
+                            <div>
+                                <strong>Distribuição Global</strong>
+                                <p>Disponível em 190 países simultaneamente</p>
+                            </div>
+                        </div>
+                        <div class="advantage">
+                            <i class="fas fa-chart-line"></i>
+                            <div>
+                                <strong>Margem de Lucro Alta</strong>
+                                <p>70% após taxas das plataformas</p>
+                            </div>
+                        </div>
+                        <div class="advantage">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <strong>Disponibilidade 24/7</strong>
+                                <p>Vendas automáticas sem horário comercial</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="comparison-side physical">
+                    <h3>
+                        <i class="fas fa-candy-cane"></i>
+                        Produto Físico (Concorrentes)
+                    </h3>
+                    <div class="disadvantages">
+                        <div class="disadvantage">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Limitações Físicas</strong>
+                                <p>Produção, estoque e distribuição custosos</p>
+                            </div>
+                        </div>
+                        <div class="disadvantage">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <strong>Mercado Regional</strong>
+                                <p>Dependente de logística local</p>
+                            </div>
+                        </div>
+                        <div class="disadvantage">
+                            <i class="fas fa-percentage"></i>
+                            <div>
+                                <strong>Margem Reduzida</strong>
+                                <p>Ingredientes, embalagem, distribuição</p>
+                            </div>
+                        </div>
+                        <div class="disadvantage">
+                            <i class="fas fa-hourglass-end"></i>
+                            <div>
+                                <strong>Perecibilidade</strong>
+                                <p>Prazo de validade e perdas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Competitor Review Section -->
+    <section class="competitor-section" id="competitor-review">
+        <div class="container">
+            <h2 class="section-title">Análise Competitiva: Falhas Identificadas</h2>
+            
+            <div class="competitor-analysis">
+                <div class="analysis-card critical">
+                    <div class="analysis-header">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Erro Estratégico Crítico</h3>
+                        <span class="severity high">Alta Gravidade</span>
+                    </div>
+                    <div class="analysis-content">
+                        <div class="error-description">
+                            <h4>Identificação Incorreta de Concorrentes</h4>
+                            <p>Durante apresentação, citaram <strong>Shadow Games Studio</strong> (empresa de jogos) como concorrente direto de produto alimentício.</p>
+                        </div>
+                        <div class="impact-analysis">
+                            <h5>Impacto nos Negócios:</h5>
+                            <ul>
+                                <li>Demonstra falta de research básico de mercado</li>
+                                <li>Questiona competência em análise competitiva</li>
+                                <li>Indica possível falha em segmentação de público</li>
+                                <li>Reduz credibilidade junto a investidores</li>
+                            </ul>
+                        </div>
+                        <div class="recommendation">
+                            <strong>Recomendação:</strong> Revisão completa da estratégia de mercado e identificação correta do landscape competitivo.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analysis-card warning">
+                    <div class="analysis-header">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h3>Despreparo em Apresentação</h3>
+                        <span class="severity medium">Média Gravidade</span>
+                    </div>
+                    <div class="analysis-content">
+                        <div class="error-description">
+                            <h4>Dependência de Dispositivos Durante Pitch</h4>
+                            <p>Equipe precisou consultar celulares múltiplas vezes durante apresentação empresarial.</p>
+                        </div>
+                        <div class="professional-standards">
+                            <h5>Standards Profissionais Esperados:</h5>
+                            <div class="standards-comparison">
+                                <div class="standard-item">
+                                    <i class="fas fa-times-circle"></i>
+                                    <span>Concorrente: Consulta constante a anotações</span>
+                                </div>
+                                <div class="standard-item success">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Shadow Games: Apresentação fluida sem consultas</span>
+                                </div>
+                                <div class="standard-item">
+                                    <i class="fas fa-times-circle"></i>
+                                    <span>Concorrente: Demonstração limitada</span>
+                                </div>
+                                <div class="standard-item success">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Shadow Games: Demo ao vivo na TV</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analysis-card info">
+                    <div class="analysis-header">
+                        <i class="fas fa-lightbulb"></i>
+                        <h3>Oportunidades de Melhoria</h3>
+                        <span class="severity low">Consultoria</span>
+                    </div>
+                    <div class="analysis-content">
+                        <div class="recommendations-list">
+                            <h4>Recomendações Estratégicas:</h4>
+                            <div class="recommendation-item">
+                                <i class="fas fa-search"></i>
+                                <div>
+                                    <strong>Research de Mercado</strong>
+                                    <p>Implementar processo rigoroso de análise competitiva</p>
+                                </div>
+                            </div>
+                            <div class="recommendation-item">
+                                <i class="fas fa-presentation"></i>
+                                <div>
+                                    <strong>Preparação de Pitch</strong>
+                                    <p>Treinamento intensivo para apresentações empresariais</p>
+                                </div>
+                            </div>
+                            <div class="recommendation-item">
+                                <i class="fas fa-users"></i>
+                                <div>
+                                    <strong>Capacitação da Equipe</strong>
+                                    <p>Desenvolvimento de soft skills empresariais</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="conclusion-card">
+                <h3>Conclusão da Análise</h3>
+                <p>
+                    A análise revela <strong>gaps significativos</strong> na preparação e execução empresarial do concorrente. 
+                    Enquanto questionam nossos números baseados em dados de mercado sólidos, demonstram falhas básicas 
+                    em research e profissionalismo que comprometem sua credibilidade no setor.
+                </p>
+                <div class="conclusion-stats">
+                    <div class="conclusion-stat">
+                        <span class="stat-value">2</span>
+                        <span class="stat-label">Erros Críticos Identificados</span>
+                    </div>
+                    <div class="conclusion-stat">
+                        <span class="stat-value">0</span>
+                        <span class="stat-label">Falhas em Nossa Apresentação</span>
+                    </div>
+                    <div class="conclusion-stat">
+                        <span class="stat-value">100%</span>
+                        <span class="stat-label">Consistência de Dados</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Shadow Games Studio</h3>
+                    <p>Liderando o mercado de jogos indie com excelência técnica e visão empresarial sólida.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Relatórios</h4>
+                    <ul>
+                        <li><a href="#overview">Performance Report</a></li>
+                        <li><a href="#defense">Market Defense</a></li>
+                        <li><a href="#competitor-review">Competitive Analysis</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Contato Empresarial</h4>
+                    <p>Para consultorias e análises de mercado</p>
+                    <p>analytics@shadowgames.com</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Shadow Games Studio. Análises baseadas em dados reais de mercado.</p>
+                <p>Dashboard desenvolvido para fins acadêmicos e demonstrativos.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="analytics-script.js"></script>
+</body>
+</html>
