@@ -33,6 +33,13 @@ let platformChart, timelineChart;
 function initializeDashboard() {
     console.log('📊 Inicializando Shadow Games Analytics Dashboard...');
     
+    // Verificar se Chart.js foi carregado
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js não foi carregado!');
+        showToast('Erro: Chart.js não carregado. Verifique a conexão com internet.', 'error');
+        return;
+    }
+    
     // Inicializar gráficos
     initializePlatformChart();
     initializeTimelineChart();
@@ -53,7 +60,10 @@ function initializeDashboard() {
 // Gráfico de Pizza - Plataformas
 function initializePlatformChart() {
     const ctx = document.getElementById('platformChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.error('Canvas platformChart não encontrado!');
+        return;
+    }
     
     const data = analyticsData.downloads.platforms;
     
@@ -88,7 +98,6 @@ function initializePlatformChart() {
                     borderColor: '#b71c1c',
                     borderWidth: 1,
                     callbacks: {
-                    callbacks: {
                         label: function(context) {
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = ((context.parsed / total) * 100).toFixed(1);
@@ -104,7 +113,10 @@ function initializePlatformChart() {
 // Gráfico de Linha - Timeline
 function initializeTimelineChart() {
     const ctx = document.getElementById('timelineChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.error('Canvas timelineChart não encontrado!');
+        return;
+    }
     
     const data = analyticsData.timeline;
     
@@ -224,7 +236,10 @@ function initializeCounters() {
 
 function animateCounter(elementId, target, format) {
     const element = document.getElementById(elementId);
-    if (!element) return;
+    if (!element) {
+        console.warn(`Elemento ${elementId} não encontrado para animação de contador`);
+        return;
+    }
     
     const startValue = 0;
     const duration = 2000;
@@ -315,7 +330,7 @@ function updateCounters() {
 
 function updateCharts() {
     // Atualizar gráfico de plataformas
-    if (platformChart) {
+    if (platformChart && platformChart.data && platformChart.data.datasets[0]) {
         const data = analyticsData.downloads.platforms;
         platformChart.data.datasets[0].data = [data.steam, data.playstation, data.xbox, data.mobile];
         platformChart.update('none'); // Atualização sem animação para ser mais suave
@@ -372,36 +387,41 @@ function handleScroll() {
 
 // Exportar relatório
 function exportReport() {
-    const reportData = {
-        timestamp: new Date().toISOString(),
-        summary: {
-            totalDownloads: analyticsData.downloads.total,
-            totalRevenue: analyticsData.revenue,
-            roi: analyticsData.roi + '%',
-            platforms: analyticsData.downloads.platforms
-        },
-        analysis: {
-            marketPosition: 'Líder em Horror Indie',
-            competitiveAdvantage: 'Multiplataforma + Timing estratégico',
-            criticalErrors: 'Concorrente: Identificação incorreta de mercado',
-            professionalGap: 'Concorrente: Despreparo em apresentação'
-        }
-    };
-    
-    // Criar blob e download
-    const blob = new Blob([JSON.stringify(reportData, null, 2)], { 
-        type: 'application/json' 
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `shadow-games-analytics-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    showToast('Relatório exportado com sucesso!', 'success');
+    try {
+        const reportData = {
+            timestamp: new Date().toISOString(),
+            summary: {
+                totalDownloads: analyticsData.downloads.total,
+                totalRevenue: analyticsData.revenue,
+                roi: analyticsData.roi + '%',
+                platforms: analyticsData.downloads.platforms
+            },
+            analysis: {
+                marketPosition: 'Líder em Horror Indie',
+                competitiveAdvantage: 'Multiplataforma + Timing estratégico',
+                criticalErrors: 'Concorrente: Identificação incorreta de mercado',
+                professionalGap: 'Concorrente: Despreparo em apresentação'
+            }
+        };
+        
+        // Criar blob e download
+        const blob = new Blob([JSON.stringify(reportData, null, 2)], { 
+            type: 'application/json' 
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `shadow-games-analytics-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast('Relatório exportado com sucesso!', 'success');
+    } catch (error) {
+        console.error('Erro ao exportar relatório:', error);
+        showToast('Erro ao exportar relatório. Tente novamente.', 'error');
+    }
 }
 
 // Sistema de notificações
@@ -415,6 +435,8 @@ function showToast(message, type = 'info', duration = 3000) {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
+    
+    // Aplicar estilos inline como fallback
     toast.style.cssText = `
         position: fixed;
         top: 100px;
@@ -429,6 +451,7 @@ function showToast(message, type = 'info', duration = 3000) {
         max-width: 350px;
         animation: slideInRight 0.3s ease;
         border: 1px solid rgba(255,255,255,0.2);
+        font-family: 'Roboto', sans-serif;
     `;
     
     document.body.appendChild(toast);
@@ -467,7 +490,7 @@ const competitorAnalysis = {
     ]
 };
 
-// Adicionar estilos de animação
+// Adicionar estilos de animação programaticamente
 function addAnimationStyles() {
     if (document.getElementById('analytics-animations')) return;
     
@@ -490,7 +513,7 @@ function addAnimationStyles() {
             animation: fadeInUp 0.6s ease-out both;
         }
         .header.scrolled {
-            background: rgba(0,0,0,0.98);
+            background: rgba(0,0,0,0.98) !important;
             backdrop-filter: blur(30px);
         }
     `;
@@ -499,17 +522,23 @@ function addAnimationStyles() {
 
 // Inicialização quando DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 DOM carregado, iniciando dashboard...');
+    
     addAnimationStyles();
-    initializeDashboard();
     
-    // Simular alguns eventos iniciais
+    // Aguardar um pouco para garantir que Chart.js carregou
     setTimeout(() => {
-        showToast('🎯 Dados carregados com sucesso! Monitoramento em tempo real ativo.', 'success');
-    }, 1000);
-    
-    setTimeout(() => {
-        showToast('📊 Destaque: Superando concorrentes em profissionalismo e execução!', 'info');
-    }, 3000);
+        initializeDashboard();
+        
+        // Simular alguns eventos iniciais
+        setTimeout(() => {
+            showToast('🎯 Dados carregados com sucesso! Monitoramento em tempo real ativo.', 'success');
+        }, 1000);
+        
+        setTimeout(() => {
+            showToast('📊 Destaque: Superando concorrentes em profissionalismo e execução!', 'info');
+        }, 3000);
+    }, 500);
 });
 
 // Adicionar funcionalidades extras para demonstração
@@ -531,6 +560,15 @@ setInterval(() => {
     }
 }, 60000);
 
+// Funções globais para debugging
+window.analyticsDebug = {
+    data: analyticsData,
+    charts: () => ({ platformChart, timelineChart }),
+    simulateViral: simulateViralMoment,
+    showToast: showToast
+};
+
 console.log('📈 Shadow Games Analytics Dashboard carregado!');
 console.log('🎯 Sistema de monitoramento em tempo real ativo.');
 console.log('🔥 Pronto para dominar a competição!');
+console.log('🛠️ Use window.analyticsDebug para debugging');
