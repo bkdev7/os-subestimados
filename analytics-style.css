@@ -41,6 +41,20 @@ body {
     to { opacity: 1; transform: translateX(0); }
 }
 
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+.animate-in {
+    animation: fadeInUp 0.6s ease-out both;
+}
+
 /* Header */
 .header {
     position: fixed;
@@ -51,6 +65,12 @@ body {
     z-index: 1000;
     padding: 1rem 0;
     border-bottom: 1px solid rgba(183, 28, 28, 0.2);
+    transition: all 0.3s ease;
+}
+
+.header.scrolled {
+    background: rgba(0,0,0,0.98);
+    backdrop-filter: blur(30px);
 }
 
 .nav {
@@ -270,6 +290,11 @@ body {
     color: #b71c1c;
     margin-bottom: 1.5rem;
     font-size: 1.3rem;
+}
+
+.chart-card canvas {
+    width: 100% !important;
+    height: 300px !important;
 }
 
 .chart-legend {
@@ -876,6 +901,35 @@ body {
     color: #666;
 }
 
+/* Toast Notifications */
+.toast {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    z-index: 10000;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    font-weight: 500;
+    max-width: 350px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.toast-success {
+    background: #4caf50;
+    color: white;
+}
+
+.toast-error {
+    background: #f44336;
+    color: white;
+}
+
+.toast-info {
+    background: #2196f3;
+    color: white;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .hero-stats {
@@ -913,5 +967,36 @@ body {
     
     .title-main {
         font-size: 2.5rem;
+    }
+    
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .chart-card canvas {
+        height: 250px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .title-main {
+        font-size: 2rem;
+    }
+    
+    .title-sub {
+        font-size: 1.4rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .hero-stats {
+        gap: 1rem;
+    }
+    
+    .stat {
+        min-width: 150px;
+        padding: 1rem;
     }
 }
