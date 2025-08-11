@@ -1,586 +1,333 @@
-// Os Subestimados Gaming Studio - Analytics Dashboard JavaScript
+// Os Subestimados Gaming Studio - Debate Strategy Dashboard
 
-// Dados simulados em tempo real
-const analyticsData = {
-    downloads: {
-        total: 2847392,
-        platforms: {
-            steam: 1200000,
-            playstation: 847000,
-            xbox: 625000,
-            playstore: 175392
+// Dados estratégicos para o debate
+const debateData = {
+    preparation_status: 100,
+    arguments_count: 15,
+    replies_count: 50,
+    confidence_level: "∞",
+    evidence_bank: {
+        platform_users: {
+            steam: 132000000,
+            playstation: 108000000,
+            xbox: 120000000,
+            total: 360000000
+        },
+        our_downloads: 2847392,
+        market_percentage: 0.78,
+        roi_data: {
+            steam: { investment: 200000, return: 3400000, roi: 1700 },
+            playstation: { investment: 150000, return: 2400000, roi: 1600 },
+            xbox: { investment: 100000, return: 1800000, roi: 1800 },
+            average_roi: 1700
+        },
+        competitor_games: [
+            { name: "Phasmophobia", downloads: "10M", timeframe: "3 meses" },
+            { name: "Among Us", downloads: "500M", timeframe: "4 meses" },
+            { name: "Fall Guys", downloads: "100M", timeframe: "2 meses" },
+            { name: "Nosso jogo", downloads: "2.8M", timeframe: "2 meses", highlight: true }
+        ]
+    },
+    battle_quotes: [
+        "🎯 Preparação é a chave da vitória!",
+        "⚔️ Argumentos afiados, evidências sólidas!",
+        "🛡️ Defesa impenetrável, ataque preciso!",
+        "🏆 Os Subestimados sempre entregam!",
+        "🎮 Gaming digital, realidade diferente!",
+        "📊 Dados não mentem, números não falham!"
+    ]
+};
+
+// Estratégias por fase do debate
+const debateStrategies = {
+    opening: {
+        duration: "5 minutos",
+        key_points: [
+            "Apresentação respeitosa da equipe",
+            "Esclarecimento: não somos concorrentes",
+            "Dados de alcance multiplataforma",
+            "Timing estratégico (Halloween)",
+            "Comparação com mercado indie"
+        ]
+    },
+    replies: {
+        duration: "2-5 minutos",
+        quick_responses: {
+            "números_irreais": "Matemática simples: 0.78% de 360M usuários",
+            "somos_concorrentes": "Setores diferentes: entretenimento vs alimentício",
+            "roi_impossível": "Economia digital: 70% margem, escala global"
         }
     },
-    revenue: 8200000,
-    partnerships: 5,
-    roi: 164,
-    timeline: [
-        { week: 'Semana 1', downloads: 180000, revenue: 520000 },
-        { week: 'Semana 2', downloads: 340000, revenue: 980000 },
-        { week: 'Semana 3', downloads: 520000, revenue: 1500000 },
-        { week: 'Semana 4', downloads: 680000, revenue: 1960000 },
-        { week: 'Semana 5', downloads: 820000, revenue: 2360000 },
-        { week: 'Semana 6', downloads: 1100000, revenue: 3170000 },
-        { week: 'Semana 7', downloads: 1850000, revenue: 5330000 },
-        { week: 'Semana 8', downloads: 2847392, revenue: 8200000 }
-    ],
-    partnerships_data: {
-        steam: { investment: 200000, revenue: 3400000, roi: 1700 },
-        playstation: { investment: 150000, revenue: 2400000, roi: 1600 },
-        xbox: { investment: 100000, revenue: 1800000, roi: 1800 },
-        youtube: { investment: 80000, views: 12300000, conversion: 8.2 }
+    closing: {
+        duration: "2-5 minutos",
+        strategy: "Reconhecimento + Parceria + Vitória respeitosa"
     }
 };
 
-// Variáveis globais dos gráficos
-let platformChart, timelineChart, partnershipsChart;
+// Variáveis globais
+let debateTimer = null;
+let currentPhase = 'preparation';
+let battleMode = false;
 
-// Função de inicialização
-function initializeDashboard() {
-    console.log('🎮 Inicializando Os Subestimados Analytics Dashboard...');
+// Inicialização do Dashboard
+function initializeDebateDashboard() {
+    console.log('⚔️ Inicializando Dashboard de Estratégia de Debate...');
     
-    // Verificar se Chart.js foi carregado
-    if (typeof Chart === 'undefined') {
-        console.error('Chart.js não foi carregado!');
-        showToast('Erro: Chart.js não carregado. Verifique a conexão com internet.', 'error');
-        return;
-    }
+    // Inicializar animações
+    initializeScrollAnimations();
     
-    // Inicializar gráficos
-    initializePlatformChart();
-    initializeTimelineChart();
-    initializePartnershipsChart();
+    // Inicializar cronômetro de debate
+    initializeDebateTimer();
     
-    // Inicializar contadores animados
-    initializeCounters();
-    
-    // Inicializar atualizações em tempo real
-    initializeRealTimeUpdates();
+    // Inicializar efeitos visuais
+    initializeBattleEffects();
     
     // Event listeners
     initializeEventListeners();
     
-    // Inicializar animações de scroll
-    initializeScrollAnimations();
+    // Sistema de conquistas
+    initializeAchievementSystem();
     
-    console.log('✅ Dashboard inicializado com sucesso!');
-    showToast('🎮 Os Subestimados Dashboard Online! Dados atualizados em tempo real.', 'success');
+    console.log('✅ Dashboard de batalha pronto para o combate!');
+    showBattleToast('⚔️ Sistema de combate online! Os Subestimados prontos para a batalha!', 'battle');
 }
 
-// Gráfico de Pizza - Plataformas
-function initializePlatformChart() {
-    const ctx = document.getElementById('platformChart');
-    if (!ctx) {
-        console.error('Canvas platformChart não encontrado!');
-        return;
+// Cronômetro para fases do debate
+function initializeDebateTimer() {
+    // Criar cronômetro visual se não existir
+    const timerContainer = document.createElement('div');
+    timerContainer.id = 'debate-timer';
+    timerContainer.innerHTML = `
+        <div class="timer-display">
+            <div class="timer-phase">Preparação</div>
+            <div class="timer-time">00:00</div>
+            <div class="timer-controls">
+                <button onclick="startDebatePhase('opening')" class="timer-btn">🎯 Iniciar (5min)</button>
+                <button onclick="startDebatePhase('reply')" class="timer-btn">🛡️ Réplica (3min)</button>
+                <button onclick="startDebatePhase('closing')" class="timer-btn">🏆 Fechamento (3min)</button>
+                <button onclick="stopDebateTimer()" class="timer-btn stop">⏹️ Parar</button>
+            </div>
+        </div>
+    `;
+    
+    // Adicionar estilos do cronômetro
+    timerContainer.style.cssText = `
+        position: fixed;
+        top: 80px;
+        left: 20px;
+        background: rgba(0,0,0,0.9);
+        padding: 1rem;
+        border-radius: 10px;
+        border: 2px solid #b71c1c;
+        z-index: 9999;
+        font-family: 'Orbitron', monospace;
+        color: white;
+        min-width: 250px;
+        display: none;
+    `;
+    
+    document.body.appendChild(timerContainer);
+}
+
+function startDebatePhase(phase) {
+    const durations = {
+        'opening': 5 * 60, // 5 minutos
+        'reply': 3 * 60,   // 3 minutos  
+        'closing': 3 * 60  // 3 minutos
+    };
+    
+    const phaseNames = {
+        'opening': 'Argumentos Iniciais',
+        'reply': 'Réplica',
+        'closing': 'Fechamento'
+    };
+    
+    let timeLeft = durations[phase];
+    currentPhase = phase;
+    
+    const timerDisplay = document.querySelector('.timer-time');
+    const phaseDisplay = document.querySelector('.timer-phase');
+    
+    if (!timerDisplay || !phaseDisplay) return;
+    
+    phaseDisplay.textContent = phaseNames[phase];
+    
+    // Parar cronômetro anterior
+    if (debateTimer) {
+        clearInterval(debateTimer);
     }
     
-    const data = analyticsData.downloads.platforms;
-    
-    platformChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Steam', 'PlayStation', 'Xbox', 'Play Store'],
-            datasets: [{
-                data: [data.steam, data.playstation, data.xbox, data.playstore],
-                backgroundColor: [
-                    '#1e88e5',
-                    '#0070d1', 
-                    '#107c10',
-                    '#ff6f00'
-                ],
-                borderColor: '#0a0a0a',
-                borderWidth: 3,
-                hoverBorderWidth: 5,
-                hoverOffset: 10
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.9)',
-                    titleColor: '#b71c1c',
-                    bodyColor: '#e0e0e0',
-                    borderColor: '#b71c1c',
-                    borderWidth: 2,
-                    cornerRadius: 10,
-                    callbacks: {
-                        label: function(context) {
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((context.parsed / total) * 100).toFixed(1);
-                            return context.label + ': ' + context.parsed.toLocaleString('pt-BR') + ' (' + percentage + '%)';
-                        }
-                    }
-                }
-            },
-            animation: {
-                animateRotate: true,
-                duration: 2000
-            }
-        }
-    });
-}
-
-// Gráfico de Linha - Timeline
-function initializeTimelineChart() {
-    const ctx = document.getElementById('timelineChart');
-    if (!ctx) {
-        console.error('Canvas timelineChart não encontrado!');
-        return;
-    }
-    
-    const data = analyticsData.timeline;
-    
-    timelineChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data.map(item => item.week),
-            datasets: [
-                {
-                    label: 'Downloads',
-                    data: data.map(item => item.downloads),
-                    borderColor: '#4caf50',
-                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                    borderWidth: 4,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#4caf50',
-                    pointBorderColor: '#0a0a0a',
-                    pointBorderWidth: 3,
-                    pointRadius: 8,
-                    pointHoverRadius: 12
-                },
-                {
-                    label: 'Receita (R$)',
-                    data: data.map(item => item.revenue),
-                    borderColor: '#b71c1c',
-                    backgroundColor: 'rgba(183, 28, 28, 0.1)',
-                    borderWidth: 4,
-                    fill: false,
-                    tension: 0.4,
-                    pointBackgroundColor: '#b71c1c',
-                    pointBorderColor: '#0a0a0a',
-                    pointBorderWidth: 3,
-                    pointRadius: 8,
-                    pointHoverRadius: 12,
-                    yAxisID: 'y1'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-                intersect: false,
-                mode: 'index'
-            },
-            plugins: {
-                legend: {
-                    labels: {
-                        color: '#e0e0e0',
-                        font: {
-                            family: 'Orbitron',
-                            size: 14,
-                            weight: 'bold'
-                        }
-                    }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.9)',
-                    titleColor: '#b71c1c',
-                    bodyColor: '#e0e0e0',
-                    borderColor: '#b71c1c',
-                    borderWidth: 2,
-                    cornerRadius: 10
-                }
-            },
-            scales: {
-                x: {
-                    ticks: {
-                        color: '#ccc',
-                        font: {
-                            family: 'Orbitron'
-                        }
-                    },
-                    grid: {
-                        color: 'rgba(255,255,255,0.1)'
-                    }
-                },
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    ticks: {
-                        color: '#4caf50',
-                        font: {
-                            family: 'Orbitron'
-                        },
-                        callback: function(value) {
-                            return (value / 1000000).toFixed(1) + 'M';
-                        }
-                    },
-                    grid: {
-                        color: 'rgba(76, 175, 80, 0.1)'
-                    }
-                },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    ticks: {
-                        color: '#b71c1c',
-                        font: {
-                            family: 'Orbitron'
-                        },
-                        callback: function(value) {
-                            return 'R$ ' + (value / 1000000).toFixed(1) + 'M';
-                        }
-                    },
-                    grid: {
-                        drawOnChartArea: false,
-                        color: 'rgba(183, 28, 28, 0.1)'
-                    }
-                }
-            },
-            animation: {
-                duration: 2000,
-                easing: 'easeInOutQuart'
-            }
-        }
-    });
-}
-
-// Novo gráfico - ROI das Parcerias
-function initializePartnershipsChart() {
-    // Criar um canvas dinamicamente se não existir
-    let ctx = document.getElementById('partnershipsChart');
-    if (!ctx) {
-        // Criar seção de gráfico de parcerias se não existir
-        const partnershipsSection = document.querySelector('.partnerships-section .container');
-        if (partnershipsSection) {
-            const chartContainer = document.createElement('div');
-            chartContainer.className = 'chart-card';
-            chartContainer.style.marginTop = '2rem';
-            chartContainer.innerHTML = `
-                <h3>ROI das Parcerias</h3>
-                <canvas id="partnershipsChart" width="400" height="200"></canvas>
-            `;
-            partnershipsSection.appendChild(chartContainer);
-            ctx = document.getElementById('partnershipsChart');
-        } else {
+    // Iniciar novo cronômetro
+    debateTimer = setInterval(() => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        
+        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        // Alertas de tempo
+        if (timeLeft === 60) {
+            showBattleToast('⚠️ 1 MINUTO RESTANTE!', 'warning');
+        } else if (timeLeft === 30) {
+            showBattleToast('🚨 30 SEGUNDOS RESTANTES!', 'error');
+        } else if (timeLeft === 0) {
+            showBattleToast('⏰ TEMPO ESGOTADO!', 'error');
+            stopDebateTimer();
             return;
         }
+        
+        timeLeft--;
+    }, 1000);
+    
+    showBattleToast(`🎯 ${phaseNames[phase]} iniciado! Tempo: ${Math.floor(timeLeft/60)} minutos`, 'battle');
+}
+
+function stopDebateTimer() {
+    if (debateTimer) {
+        clearInterval(debateTimer);
+        debateTimer = null;
     }
     
-    const partnerships = analyticsData.partnerships_data;
+    const timerDisplay = document.querySelector('.timer-time');
+    const phaseDisplay = document.querySelector('.timer-phase');
     
-    partnershipsChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Steam', 'PlayStation', 'Xbox', 'YouTube'],
-            datasets: [{
-                label: 'ROI (%)',
-                data: [
-                    partnerships.steam.roi,
-                    partnerships.playstation.roi,
-                    partnerships.xbox.roi,
-                    partnerships.youtube.conversion * 100
-                ],
-                backgroundColor: [
-                    'rgba(30, 136, 229, 0.8)',
-                    'rgba(0, 112, 209, 0.8)',
-                    'rgba(16, 124, 16, 0.8)',
-                    'rgba(255, 0, 0, 0.8)'
-                ],
-                borderColor: [
-                    '#1e88e5',
-                    '#0070d1',
-                    '#107c10',
-                    '#ff0000'
-                ],
-                borderWidth: 2,
-                borderRadius: 8
-            }]
+    if (timerDisplay && phaseDisplay) {
+        timerDisplay.textContent = '00:00';
+        phaseDisplay.textContent = 'Parado';
+    }
+    
+    showBattleToast('⏹️ Cronômetro parado', 'info');
+}
+
+function toggleDebateTimer() {
+    const timer = document.getElementById('debate-timer');
+    if (timer) {
+        timer.style.display = timer.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+// Efeitos visuais de batalha
+function initializeBattleEffects() {
+    // Efeito de typing nos textos importantes
+    const importantTexts = document.querySelectorAll('.final-line, .closing-speech p:first-child');
+    importantTexts.forEach(text => {
+        if (text.textContent.length > 50) { // Só para textos longos
+            const originalText = text.textContent;
+            text.textContent = '';
+            let i = 0;
+            const typingEffect = setInterval(() => {
+                text.textContent += originalText[i];
+                i++;
+                if (i >= originalText.length) {
+                    clearInterval(typingEffect);
+                }
+            }, 30);
+        }
+    });
+    
+    // Efeito de contadores nos stats
+    const stats = document.querySelectorAll('.stat-value');
+    stats.forEach(stat => {
+        if (stat.textContent === '∞') return;
+        
+        const finalValue = stat.textContent;
+        const numericValue = parseInt(finalValue.replace(/\D/g, ''));
+        
+        if (numericValue && numericValue < 1000) {
+            let current = 0;
+            const increment = numericValue / 50;
+            
+            const counter = setInterval(() => {
+                current += increment;
+                if (current >= numericValue) {
+                    stat.textContent = finalValue;
+                    clearInterval(counter);
+                } else {
+                    stat.textContent = Math.floor(current) + (finalValue.includes('%') ? '%' : '+');
+                }
+            }, 30);
+        }
+    });
+}
+
+// Sistema de conquistas para debate
+function initializeAchievementSystem() {
+    const achievements = {
+        'first_argument': {
+            name: '🎯 PRIMEIRO ARGUMENTO',
+            description: 'Estruturou o primeiro argumento estratégico',
+            unlocked: false
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.9)',
-                    titleColor: '#b71c1c',
-                    bodyColor: '#e0e0e0',
-                    borderColor: '#b71c1c',
-                    borderWidth: 2,
-                    cornerRadius: 10,
-                    callbacks: {
-                        label: function(context) {
-                            if (context.label === 'YouTube') {
-                                return 'Conversão: ' + context.parsed.y.toFixed(1) + '%';
-                            }
-                            return 'ROI: ' + context.parsed.y.toFixed(0) + '%';
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: {
-                        color: '#ccc',
-                        font: {
-                            family: 'Orbitron'
-                        }
-                    },
-                    grid: {
-                        color: 'rgba(255,255,255,0.1)'
-                    }
-                },
-                y: {
-                    ticks: {
-                        color: '#ff6600',
-                        font: {
-                            family: 'Orbitron'
-                        },
-                        callback: function(value) {
-                            return value + '%';
-                        }
-                    },
-                    grid: {
-                        color: 'rgba(255, 102, 0, 0.1)'
-                    }
-                }
-            },
-            animation: {
-                duration: 2000,
-                easing: 'easeInOutBounce'
+        'quick_reply': {
+            name: '⚡ RÉPLICA RELÂMPAGO',
+            description: 'Preparou uma réplica em menos de 30 segundos',
+            unlocked: false
+        },
+        'evidence_master': {
+            name: '📊 MESTRE DAS EVIDÊNCIAS',
+            description: 'Consultou todas as evidências disponíveis',
+            unlocked: false
+        },
+        'debate_warrior': {
+            name: '⚔️ GUERREIRO DO DEBATE',
+            description: 'Completou toda a preparação estratégica',
+            unlocked: false
+        }
+    };
+    
+    // Verificar conquistas baseado em interações
+    let argumentsViewed = 0;
+    let evidencesViewed = 0;
+    let repliesViewed = 0;
+    
+    // Observar interações
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.argument-card')) {
+            argumentsViewed++;
+            if (argumentsViewed >= 3 && !achievements.first_argument.unlocked) {
+                unlockAchievement('first_argument', achievements);
+            }
+        }
+        
+        if (e.target.closest('.reply-card')) {
+            repliesViewed++;
+            if (repliesViewed >= 5 && !achievements.quick_reply.unlocked) {
+                unlockAchievement('quick_reply', achievements);
+            }
+        }
+        
+        if (e.target.closest('.evidence-card')) {
+            evidencesViewed++;
+            if (evidencesViewed >= 4 && !achievements.evidence_master.unlocked) {
+                unlockAchievement('evidence_master', achievements);
             }
         }
     });
+    
+    // Conquista final após tempo navegando
+    setTimeout(() => {
+        if (!achievements.debate_warrior.unlocked) {
+            unlockAchievement('debate_warrior', achievements);
+        }
+    }, 120000); // 2 minutos
 }
 
-// Contadores animados
-function initializeCounters() {
-    const counters = [
-        { element: 'totalDownloads', target: analyticsData.downloads.total, format: 'number' },
-        { element: 'totalRevenue', target: analyticsData.revenue, format: 'currency' }
-    ];
+function unlockAchievement(id, achievements) {
+    achievements[id].unlocked = true;
+    const achievement = achievements[id];
     
-    counters.forEach(counter => {
-        animateCounter(counter.element, counter.target, counter.format);
-    });
+    showBattleToast(`${achievement.name} DESBLOQUEADO! ${achievement.description}`, 'success', 6000);
     
-    // Animar stats das parcerias se existirem
-    animatePartnershipStats();
+    // Efeito visual especial
+    document.body.style.animation = 'battleGlow 1s ease-in-out';
+    setTimeout(() => {
+        document.body.style.animation = '';
+    }, 1000);
 }
 
-function animateCounter(elementId, target, format) {
-    const element = document.getElementById(elementId);
-    if (!element) {
-        console.warn(`Elemento ${elementId} não encontrado para animação de contador`);
-        return;
-    }
-    
-    const startValue = 0;
-    const duration = 3000;
-    const increment = target / (duration / 16);
-    let current = startValue;
-    
-    const timer = setInterval(() => {
-        current += increment;
-        
-        if (current >= target) {
-            current = target;
-            clearInterval(timer);
-        }
-        
-        if (format === 'currency') {
-            element.textContent = 'R$ ' + (current / 1000000).toFixed(1) + 'M';
-        } else if (format === 'number') {
-            element.textContent = Math.floor(current).toLocaleString('pt-BR');
-        }
-    }, 16);
-}
-
-function animatePartnershipStats() {
-    // Animar valores das parcerias
-    const partnerships = analyticsData.partnerships_data;
-    
-    Object.keys(partnerships).forEach(platform => {
-        const data = partnerships[platform];
-        
-        // Animar investimento
-        const investmentEl = document.querySelector(`[data-partnership="${platform}"] .investment-value`);
-        if (investmentEl) {
-            animateValue(investmentEl, 0, data.investment, 2000, value => 
-                'R$ ' + (value / 1000).toFixed(0) + 'K'
-            );
-        }
-        
-        // Animar receita
-        const revenueEl = document.querySelector(`[data-partnership="${platform}"] .revenue-value`);
-        if (revenueEl) {
-            animateValue(revenueEl, 0, data.revenue, 2500, value => 
-                'R$ ' + (value / 1000000).toFixed(1) + 'M'
-            );
-        }
-        
-        // Animar ROI
-        const roiEl = document.querySelector(`[data-partnership="${platform}"] .roi-value`);
-        if (roiEl) {
-            animateValue(roiEl, 0, data.roi, 3000, value => 
-                value.toFixed(0) + '%'
-            );
-        }
-    });
-}
-
-function animateValue(element, start, end, duration, formatter) {
-    const increment = (end - start) / (duration / 16);
-    let current = start;
-    
-    const timer = setInterval(() => {
-        current += increment;
-        
-        if (current >= end) {
-            current = end;
-            clearInterval(timer);
-        }
-        
-        element.textContent = formatter(current);
-    }, 16);
-}
-
-// Atualizações em tempo real (simuladas)
-function initializeRealTimeUpdates() {
-    // Simular novos downloads a cada 45 segundos
-    setInterval(() => {
-        const newDownloads = Math.floor(Math.random() * 800) + 200;
-        analyticsData.downloads.total += newDownloads;
-        
-        // Distribuir entre plataformas (Steam lidera)
-        const steamInc = Math.floor(newDownloads * 0.42);
-        const psInc = Math.floor(newDownloads * 0.30);
-        const xboxInc = Math.floor(newDownloads * 0.22);
-        const playStoreInc = newDownloads - steamInc - psInc - xboxInc;
-        
-        analyticsData.downloads.platforms.steam += steamInc;
-        analyticsData.downloads.platforms.playstation += psInc;
-        analyticsData.downloads.platforms.xbox += xboxInc;
-        analyticsData.downloads.platforms.playstore += playStoreInc;
-        
-        // Atualizar receita (R$ 2.88 por download em média)
-        const newRevenue = newDownloads * 2.88;
-        analyticsData.revenue += newRevenue;
-        
-        // Atualizar contadores na tela
-        updateCounters();
-        
-        // Atualizar gráficos
-        updateCharts();
-        
-        // Mostrar notificação ocasional
-        if (Math.random() > 0.6) {
-            const notifications = [
-                `🚀 +${newDownloads} novos downloads! Os Subestimados dominando!`,
-                `🎮 Trending #1 na categoria Horror em ${Math.floor(Math.random() * 5) + 3} países!`,
-                `🏆 Steam Feature: "Exorcismo" destaque da semana!`,
-                `💎 ROI atual: ${analyticsData.roi}% - superando todas as projeções!`,
-                `🌟 PlayStation: Novo trailer exclusivo gerou +${Math.floor(Math.random() * 50000) + 10000} wishlists!`,
-                `🎯 Xbox Game Pass: Inclusão confirmada para próximo mês!`
-            ];
-            const randomNotification = notifications[Math.floor(Math.random() * notifications.length)];
-            showToast(randomNotification, 'success', 6000);
-        }
-    }, 45000);
-    
-    // Simular flutuação do ROI
-    setInterval(() => {
-        const change = Math.floor(Math.random() * 8) - 4; // -4 a +4
-        analyticsData.roi = Math.max(150, Math.min(220, analyticsData.roi + change));
-        
-        const roiElements = document.querySelectorAll('.hero-stats .stat:last-child .stat-value');
-        roiElements.forEach(el => {
-            if (el) el.textContent = analyticsData.roi + '%';
-        });
-    }, 60000);
-    
-    // Simular eventos especiais
-    setInterval(() => {
-        if (Math.random() > 0.92) { // 8% de chance
-            simulateSpecialEvent();
-        }
-    }, 120000);
-}
-
-function simulateSpecialEvent() {
-    const events = [
-        {
-            title: "VIRAL MOMENT!",
-            description: "Influencer com 2M seguidores jogou Exorcismo ao vivo!",
-            impact: Math.floor(Math.random() * 80000) + 30000
-        },
-        {
-            title: "HALLOWEEN BOOST!",
-            description: "Pico sazonal: +300% downloads na última hora!",
-            impact: Math.floor(Math.random() * 120000) + 50000
-        },
-        {
-            title: "STEAM FEATURE!",
-            description: "Destacado na página principal da Steam!",
-            impact: Math.floor(Math.random() * 100000) + 40000
-        },
-        {
-            title: "PRESS COVERAGE!",
-            description: "Matéria no IGN: 'Indie Horror Revolucionário'",
-            impact: Math.floor(Math.random() * 60000) + 25000
-        }
-    ];
-    
-    const event = events[Math.floor(Math.random() * events.length)];
-    
-    analyticsData.downloads.total += event.impact;
-    analyticsData.revenue += event.impact * 2.88;
-    
-    updateCounters();
-    updateCharts();
-    
-    showToast(`🔥 ${event.title} ${event.description} +${event.impact.toLocaleString('pt-BR')} downloads!`, 'success', 10000);
-}
-
-function updateCounters() {
-    const totalDownloadsEl = document.getElementById('totalDownloads');
-    const totalRevenueEl = document.getElementById('totalRevenue');
-    
-    if (totalDownloadsEl) {
-        totalDownloadsEl.textContent = analyticsData.downloads.total.toLocaleString('pt-BR');
-    }
-    
-    if (totalRevenueEl) {
-        totalRevenueEl.textContent = 'R$ ' + (analyticsData.revenue / 1000000).toFixed(1) + 'M';
-    }
-}
-
-function updateCharts() {
-    // Atualizar gráfico de plataformas
-    if (platformChart && platformChart.data && platformChart.data.datasets[0]) {
-        const data = analyticsData.downloads.platforms;
-        platformChart.data.datasets[0].data = [data.steam, data.playstation, data.xbox, data.playstore];
-        platformChart.update('none');
-    }
-}
-
-// Animações de scroll
+// Animações de scroll avançadas
 function initializeScrollAnimations() {
     const observerOptions = {
-        threshold: 0.1,
+        threshold: 0.15,
         rootMargin: '0px 0px -50px 0px'
     };
     
@@ -588,21 +335,36 @@ function initializeScrollAnimations() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('animate-in');
+                
+                // Animações específicas por tipo
+                if (entry.target.classList.contains('argument-card')) {
+                    const isOdd = Array.from(entry.target.parentNode.children).indexOf(entry.target) % 2 === 0;
+                    entry.target.classList.add(isOdd ? 'slide-in-left' : 'slide-in-right');
+                }
             }
         });
     }, observerOptions);
     
     // Observar elementos para animação
     const animatedElements = document.querySelectorAll(
-        '.chart-card, .partnership-card, .analysis-card, .metric, .advantage, .disadvantage'
+        '.strategy-card, .argument-card, .reply-category, .evidence-card, .closing-card'
     );
     
     animatedElements.forEach(el => observer.observe(el));
+    
+    // Parallax suave no hero
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const hero = document.querySelector('.hero');
+        if (hero) {
+            hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+        }
+    });
 }
 
-// Event Listeners
+// Event Listeners especializados
 function initializeEventListeners() {
-    // Smooth scroll para navegação
+    // Smooth scroll melhorado
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
@@ -612,145 +374,150 @@ function initializeEventListeners() {
                     behavior: 'smooth',
                     block: 'start'
                 });
+                
+                // Feedback visual
+                target.style.animation = 'battleGlow 2s ease-in-out';
+                setTimeout(() => {
+                    target.style.animation = '';
+                }, 2000);
             }
         });
     });
     
-    // Efeitos de scroll
-    window.addEventListener('scroll', handleScroll);
-    
-    // Responsividade dos gráficos
-    window.addEventListener('resize', () => {
-        if (platformChart) platformChart.resize();
-        if (timelineChart) timelineChart.resize();
-        if (partnershipsChart) partnershipsChart.resize();
-    });
-    
-    // Easter eggs para os desenvolvedores
-    addEasterEggs();
-}
-
-function addEasterEggs() {
-    // Konami Code para efeitos especiais
-    let konamiCode = [];
-    const sequence = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65]; // ↑↑↓↓←→←→BA
-    
+    // Atalhos de teclado para debate
     document.addEventListener('keydown', (e) => {
-        konamiCode.push(e.keyCode);
-        if (konamiCode.length > sequence.length) {
-            konamiCode.shift();
+        // Alt + T = Toggle Timer
+        if (e.altKey && e.key === 't') {
+            e.preventDefault();
+            toggleDebateTimer();
+            showBattleToast('⏱️ Cronômetro alternado', 'info');
         }
         
-        if (konamiCode.join(',') === sequence.join(',')) {
-            activateGodMode();
+        // Alt + B = Battle Mode
+        if (e.altKey && e.key === 'b') {
+            e.preventDefault();
+            toggleBattleMode();
+        }
+        
+        // Alt + 1,2,3 = Fases rápidas
+        if (e.altKey && ['1', '2', '3'].includes(e.key)) {
+            e.preventDefault();
+            const phases = ['opening', 'reply', 'closing'];
+            startDebatePhase(phases[parseInt(e.key) - 1]);
         }
     });
     
-    // Click secreto no logo
-    document.querySelector('.logo')?.addEventListener('dblclick', () => {
-        simulateSpecialEvent();
+    // Click duplo em cards para destacar
+    document.querySelectorAll('.strategy-card, .argument-card, .reply-card').forEach(card => {
+        card.addEventListener('dblclick', () => {
+            card.classList.toggle('highlighted');
+            card.style.border = card.classList.contains('highlighted') 
+                ? '3px solid #ffd700' 
+                : '';
+            
+            if (card.classList.contains('highlighted')) {
+                showBattleToast('⭐ Card destacado para referência rápida!', 'info');
+            }
+        });
+    });
+    
+    // Scroll effects no header
+    window.addEventListener('scroll', () => {
+        const header = document.querySelector('.header');
+        if (header) {
+            header.classList.toggle('scrolled', window.pageYOffset > 100);
+        }
     });
 }
 
-function activateGodMode() {
-    showToast('🎮 MODO DESENVOLVEDOR ATIVADO! Os Subestimados não são mais subestimados!', 'success', 8000);
+function toggleBattleMode() {
+    battleMode = !battleMode;
+    document.body.classList.toggle('battle-mode', battleMode);
     
-    // Boost massivo nos números
-    analyticsData.downloads.total += 1000000;
-    analyticsData.revenue += 2880000;
-    analyticsData.roi += 50;
-    
-    updateCounters();
-    updateCharts();
-    
-    // Efeito visual especial
-    document.body.style.animation = 'pulse 2s ease-in-out';
-    setTimeout(() => {
-        document.body.style.animation = '';
-    }, 2000);
-}
-
-// Efeitos de scroll
-function handleScroll() {
-    const scrolled = window.pageYOffset;
-    const header = document.querySelector('.header');
-    
-    if (header) {
-        header.classList.toggle('scrolled', scrolled > 100);
-    }
-    
-    // Parallax suave no hero
-    const hero = document.querySelector('.hero');
-    if (hero) {
-        const speed = scrolled * 0.5;
-        hero.style.transform = `translateY(${speed}px)`;
+    if (battleMode) {
+        showBattleToast('⚔️ MODO BATALHA ATIVADO! Preparados para dominar!', 'battle');
+        // Adicionar efeitos especiais
+        document.body.style.filter = 'contrast(1.1) saturate(1.2)';
+    } else {
+        showBattleToast('🕊️ Modo normal restaurado', 'info');
+        document.body.style.filter = '';
     }
 }
 
-// Exportar relatório
-function exportReport() {
+// Exportar guia completo de debate
+function exportDebateGuide() {
     try {
-        const reportData = {
+        const guideData = {
             timestamp: new Date().toISOString(),
-            empresa: 'Os Subestimados Gaming Studio',
-            produto: 'Exorcismo: Ritual Final',
-            periodo: '2 meses pós-lançamento',
-            summary: {
-                totalDownloads: analyticsData.downloads.total,
-                totalRevenue: analyticsData.revenue,
-                roi: analyticsData.roi + '%',
-                partnerships: analyticsData.partnerships,
-                platforms: analyticsData.downloads.platforms
-            },
-            partnerships: analyticsData.partnerships_data,
-            analysis: {
-                marketPosition: 'Líder em Horror Indie Multiplataforma',
-                competitiveAdvantage: 'Parcerias estratégicas + Timing de Halloween + Demo viral',
-                keySuccess: 'ROI médio de 1.650% nas parcerias principais',
-                marketDifference: 'Gaming digital vs Produtos físicos - setores não competitivos'
-            },
-            competitive_analysis: {
-                concorrente_pontos_positivos: [
-                    'Laiza: Excelente domínio técnico do segmento alimentício',
-                    'Gean e Henrique: Criatividade excepcional na rima do produto',
-                    'Boa dinâmica de equipe e distribuição de responsabilidades',
-                    'Produto bem conceituado no segmento alimentício'
-                ],
-                areas_melhoria: [
-                    'Research de mercado: Confusão entre setores gaming/alimentício',
-                    'Preparação de apresentação: Dependência de anotações',
-                    'Postura profissional durante pitch executivo'
-                ],
-                recomendacoes: [
-                    'Implementar análise rigorosa do landscape competitivo',
-                    'Treinamento para apresentações executivas sem consultas',
-                    'Explorar oportunidades de parceria (setores complementares)'
+            title: "Os Subestimados - Guia Completo de Debate",
+            estrategia_principal: "Setores diferentes, realidades diferentes",
+            
+            argumentos_iniciais: {
+                tempo: "5 minutos",
+                estrutura: [
+                    "0-1min: Apresentação respeitosa",
+                    "1-2min: Esclarecimento sobre setores",
+                    "2-3min: Dados de alcance multiplataforma", 
+                    "3-4min: Timing estratégico (Halloween)",
+                    "4-5min: Comparação com mercado indie"
                 ]
+            },
+            
+            arsenal_de_replicas: {
+                numeros_irreais: {
+                    rapida: "Matemática simples: 0.78% de 360M usuários",
+                    detalhada: "Distribuição digital permite alcance instantâneo global. Produtos físicos precisam logística, estoque, distribuição. No digital, um servidor atende o mundo inteiro."
+                },
+                concorrencia: {
+                    rapida: "Setores diferentes: entretenimento vs alimentício",
+                    detalhada: "Vemos oportunidades de parceria. Gamers consomem snacks. Imagine doce temático de Halloween para jogadores de horror."
+                },
+                roi_impossivel: {
+                    rapida: "ROI 1.700% no digital: margem 70% + escala global",
+                    detalhada: "Uma vez desenvolvido, cada cópia é 70% lucro. Produtos físicos têm custos recorrentes em cada unidade."
+                }
+            },
+            
+            reconhecimento_pontos_fortes: {
+                laiza: "Admiramos conhecimento técnico sobre segmento alimentício",
+                gean_henrique: "Rima criativa foi brilhante, mostra criatividade universal",
+                equipe: "Produto bem conceituado, apenas operamos em universos diferentes"
+            },
+            
+            evidencias: debateData.evidence_bank,
+            
+            fechamento_vitorioso: "Reconhecimento + Esclarecimento de setores + Proposta de parceria = Vitória respeitosa",
+            
+            atalhos_teclado: {
+                "Alt + T": "Toggle cronômetro",
+                "Alt + B": "Modo batalha",
+                "Alt + 1/2/3": "Iniciar fases do debate"
             }
         };
         
-        // Criar blob e download
-        const blob = new Blob([JSON.stringify(reportData, null, 2)], { 
+        // Criar e baixar arquivo
+        const blob = new Blob([JSON.stringify(guideData, null, 2)], { 
             type: 'application/json' 
         });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `os-subestimados-analytics-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `os-subestimados-guia-debate-${new Date().toISOString().split('T')[0]}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        showToast('📊 Relatório completo exportado! Os Subestimados sempre entregam!', 'success');
+        showBattleToast('📋 Guia completo exportado! Preparação total para a batalha!', 'success');
+        
     } catch (error) {
-        console.error('Erro ao exportar relatório:', error);
-        showToast('❌ Erro ao exportar relatório. Tente novamente.', 'error');
+        console.error('Erro ao exportar guia:', error);
+        showBattleToast('❌ Erro na exportação. Tente novamente.', 'error');
     }
 }
 
-// Sistema de notificações
-function showToast(message, type = 'info', duration = 4000) {
+// Sistema de notificações de batalha
+function showBattleToast(message, type = 'battle', duration = 4000) {
     // Remove toast existente
     const existingToast = document.querySelector('.toast');
     if (existingToast) {
@@ -759,23 +526,35 @@ function showToast(message, type = 'info', duration = 4000) {
     
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    toast.textContent = message;
+    toast.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.2rem;">${getToastIcon(type)}</span>
+            <span>${message}</span>
+        </div>
+    `;
     
-    // Aplicar estilos inline como fallback
+    // Estilos específicos para o tipo
+    const styles = {
+        battle: 'background: linear-gradient(45deg, #b71c1c, #ff6600); color: white;',
+        success: 'background: #4caf50; color: white;',
+        error: 'background: #f44336; color: white;',
+        warning: 'background: #ff9800; color: white;',
+        info: 'background: #2196f3; color: white;'
+    };
+    
     toast.style.cssText = `
         position: fixed;
         top: 100px;
         right: 20px;
-        background: ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3'};
-        color: white;
+        ${styles[type]}
         padding: 1rem 1.5rem;
         border-radius: 10px;
         z-index: 10000;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.4);
         font-weight: 500;
         max-width: 400px;
         animation: slideInRight 0.3s ease;
-        border: 1px solid rgba(255,255,255,0.2);
+        border: 2px solid rgba(255,255,255,0.2);
         font-family: 'Orbitron', monospace;
         font-size: 0.9rem;
     `;
@@ -783,7 +562,7 @@ function showToast(message, type = 'info', duration = 4000) {
     document.body.appendChild(toast);
     
     setTimeout(() => {
-        toast.style.animation = 'slideOutRight 0.3s ease forwards';
+        toast.style.animation = 'slideInRight 0.3s ease reverse';
         setTimeout(() => {
             if (toast.parentNode) {
                 toast.remove();
@@ -792,35 +571,64 @@ function showToast(message, type = 'info', duration = 4000) {
     }, duration);
 }
 
+function getToastIcon(type) {
+    const icons = {
+        battle: '⚔️',
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: 'ℹ️'
+    };
+    return icons[type] || '📢';
+}
+
+// Frases motivacionais aleatórias
+function showRandomBattleQuote() {
+    const quote = debateData.battle_quotes[Math.floor(Math.random() * debateData.battle_quotes.length)];
+    showBattleToast(quote, 'battle', 3000);
+}
+
+// Quick Access Functions
+function quickReply(type) {
+    const replies = debateStrategies.replies.quick_responses;
+    if (replies[type]) {
+        showBattleToast(`💬 Réplica: ${replies[type]}`, 'info', 6000);
+    }
+}
+
 // Adicionar estilos de animação programaticamente
-function addAnimationStyles() {
-    if (document.getElementById('gaming-animations')) return;
+function addBattleStyles() {
+    if (document.getElementById('battle-animations')) return;
     
     const style = document.createElement('style');
-    style.id = 'gaming-animations';
+    style.id = 'battle-animations';
     style.textContent = `
         @keyframes slideInRight {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-        @keyframes slideOutRight {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
+        
+        @keyframes battleGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(183, 28, 28, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(183, 28, 28, 0.8); }
         }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        
+        .battle-mode {
+            filter: contrast(1.1) saturate(1.2) !important;
         }
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(183, 28, 28, 0.3); }
-            50% { box-shadow: 0 0 30px rgba(183, 28, 28, 0.6); }
+        
+        .highlighted {
+            position: relative;
+            z-index: 10;
         }
-        .animate-in {
-            animation: fadeInUp 0.6s ease-out both;
-        }
-        .header.scrolled {
-            background: rgba(0,0,0,0.98) !important;
-            backdrop-filter: blur(30px);
+        
+        .highlighted::after {
+            content: '⭐';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 1.5rem;
+            animation: pulse 2s infinite;
         }
     `;
     document.head.appendChild(style);
@@ -828,106 +636,48 @@ function addAnimationStyles() {
 
 // Inicialização quando DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎮 DOM carregado, iniciando Os Subestimados Dashboard...');
+    console.log('⚔️ DOM carregado, iniciando preparação para batalha...');
     
-    addAnimationStyles();
+    addBattleStyles();
     
-    // Aguardar um pouco para garantir que Chart.js carregou
     setTimeout(() => {
-        initializeDashboard();
+        initializeDebateDashboard();
         
-        // Eventos iniciais com tema gaming
+        // Mensagens iniciais motivacionais
         setTimeout(() => {
-            showToast('🚀 Os Subestimados Dashboard Online! Sistemas operacionais.', 'success');
+            showBattleToast('🎯 Os Subestimados prontos para dominar o debate!', 'battle');
         }, 1000);
         
         setTimeout(() => {
-            showToast('🎯 Parcerias ativas: Steam, PlayStation, Xbox, YouTube', 'info');
+            showBattleToast('💡 Dica: Alt+T para cronômetro, Alt+B para modo batalha', 'info');
         }, 3000);
         
         setTimeout(() => {
-            showToast('🏆 Status: Dominando o mercado indie horror!', 'success');
-        }, 5000);
+            showRandomBattleQuote();
+        }, 6000);
+        
     }, 500);
 });
 
-// Funções de demonstração e debug
-function simulateViralMoment() {
-    const viralBoost = Math.floor(Math.random() * 100000) + 50000;
-    analyticsData.downloads.total += viralBoost;
-    analyticsData.revenue += viralBoost * 2.88;
-    
-    updateCounters();
-    updateCharts();
-    
-    showToast(`🔥 MOMENTO VIRAL! +${viralBoost.toLocaleString('pt-BR')} downloads! Os Subestimados viralizaram globalmente!`, 'success', 10000);
-}
-
-// Simular conquistas
-function unlockAchievement(achievement) {
-    const achievements = {
-        'first_million': {
-            title: '🏆 PRIMEIRO MILHÃO',
-            description: 'Parabéns! 1 milhão de downloads alcançados!'
-        },
-        'partnership_master': {
-            title: '🤝 MESTRE DAS PARCERIAS', 
-            description: 'ROI médio acima de 1000% em todas as parcerias!'
-        },
-        'viral_hit': {
-            title: '🌟 HIT VIRAL',
-            description: 'Trending mundial em múltiplas plataformas!'
-        },
-        'halloween_king': {
-            title: '🎃 REI DO HALLOWEEN',
-            description: 'Jogo #1 na categoria horror durante outubro!'
-        }
-    };
-    
-    const ach = achievements[achievement];
-    if (ach) {
-        showToast(`${ach.title} - ${ach.description}`, 'success', 8000);
-    }
-}
-
-// Verificar conquistas automaticamente
-setInterval(() => {
-    if (analyticsData.downloads.total >= 1000000 && !window.achievements?.first_million) {
-        unlockAchievement('first_million');
-        window.achievements = window.achievements || {};
-        window.achievements.first_million = true;
-    }
-    
-    if (analyticsData.roi >= 170 && !window.achievements?.partnership_master) {
-        unlockAchievement('partnership_master');
-        window.achievements = window.achievements || {};
-        window.achievements.partnership_master = true;
-    }
-}, 30000);
+// Frases motivacionais a cada 2 minutos
+setInterval(showRandomBattleQuote, 120000);
 
 // Funções globais para debugging e demonstração
-window.gamingDebug = {
-    data: analyticsData,
-    charts: () => ({ platformChart, timelineChart, partnershipsChart }),
-    simulateViral: simulateViralMoment,
-    unlockAchievement: unlockAchievement,
-    activateGodMode: activateGodMode,
-    showToast: showToast,
-    export: exportReport
+window.debateDebug = {
+    data: debateData,
+    strategies: debateStrategies,
+    startTimer: startDebatePhase,
+    stopTimer: stopDebateTimer,
+    toggleBattle: toggleBattleMode,
+    quickReply: quickReply,
+    export: exportDebateGuide,
+    showToast: showBattleToast
 };
 
-// Console styling para desenvolvedores
-const consoleStyle = {
-    title: 'color: #b71c1c; font-size: 16px; font-weight: bold;',
-    success: 'color: #4caf50; font-size: 12px;',
-    info: 'color: #2196f3; font-size: 12px;',
-    warning: 'color: #ff9800; font-size: 12px;'
-};
-
-console.log('%c🎮 OS SUBESTIMADOS GAMING STUDIO', consoleStyle.title);
-console.log('%c📊 Analytics Dashboard carregado com sucesso!', consoleStyle.success);
-console.log('%c🎯 Sistema de monitoramento em tempo real ativo.', consoleStyle.info);
-console.log('%c🔥 Pronto para dominar a competição!', consoleStyle.success);
-console.log('%c🛠️ Use window.gamingDebug para debugging e demos', consoleStyle.info);
-console.log('%c⌨️ Easter egg: Tente o código Konami (↑↑↓↓←→←→BA)', consoleStyle.warning);
-console.log('%c🖱️ Double-click no logo para eventos especiais', consoleStyle.warning);
+// Console styling épico
+console.log('%c⚔️ OS SUBESTIMADOS BATTLE SYSTEM', 'color: #b71c1c; font-size: 18px; font-weight: bold;');
+console.log('%c🎯 Dashboard de estratégia carregado!', 'color: #4caf50; font-size: 14px;');
+console.log('%c🛡️ Sistema de defesa ativado!', 'color: #2196f3; font-size: 12px;');
+console.log('%c🏆 Preparados para a vitória!', 'color: #ffd700; font-size: 14px;');
+console.log('%c⌨️ Atalhos: Alt+T (timer), Alt+B (battle), Alt+1/2/3 (fases)', 'color: #ff9800; font-size: 11px;');
+console.log('%c🔧 Debug: window.debateDebug', 'color: #9c27b0; font-size: 11px;');
