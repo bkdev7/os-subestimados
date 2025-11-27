@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funções Orgânicas 3D</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 80px;
+        }
+
+        h1 {
+            font-size: 5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            font-size: 1.8em;
+            color: #888;
+            font-weight: 300;
+            letter-spacing: 4px;
+        }
+
+        .section-title {
+            font-size: 3em;
+            text-align: center;
+            margin: 100px 0 60px;
+            color: #667eea;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #667eea, transparent);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 50px;
+            margin-bottom: 100px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 40px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at top left, rgba(102, 126, 234, 0.1), transparent 50%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .canvas-container {
+            width: 100%;
+            height: 250px;
+            margin-bottom: 30px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .formula {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 15px;
+            font-size: 1.4em;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .description {
+            color: #aaa;
+            line-height: 1.8;
+            font-size: 1.05em;
+            margin-bottom: 20px;
+        }
+
+        .examples {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 15px;
+            color: #888;
+            font-size: 0.95em;
+            line-height: 1.8;
+        }
+
+        .team {
+            text-align: center;
+            margin-top: 120px;
+            padding: 60px 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .team h2 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 40px;
+            font-weight: 700;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .member {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 25px;
+            border-radius: 20px;
+            font-size: 1.4em;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .member:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 3em; }
+            .grid { grid-template-columns: 1fr; }
+            .section-title { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>FUNÇÕES ORGÂNICAS</h1>
+            <p class="subtitle">NITROGENADAS & HALOGENADAS</p>
+        </header>
+
+        <div class="section-title">⚛️ FUNÇÕES NITROGENADAS</div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="canvas-container" id="amina-canvas"></div>
+                <h3 class="card-title">Aminas</h3>
+                <div class="formula">R—NH₂</div>
+                <p class="description">Derivadas da amônia onde hidrogênios são substituídos por radicais orgânicos.</p>
+                <div class="examples">💊 Exemplos: Anilina, Adrenalina, Metilamina</div>
+            </div>
+
+            <div class="card">
+                <div class="canvas-container" id="amida-canvas"></div>
+                <h3 class="card-title">Amidas</h3>
+                <div class="formula">R—CO—NH₂</div>
+                <p class="description">Derivadas de ácidos carboxílicos com grupo amino.</p>
+                <div class="examples">🧬 Exemplos: Ureia, Proteínas, Nylon</div>
+            </div>
+
+            <div class="card">
+                <div class="canvas-container" id="nitrila-canvas"></div>
+                <h3 class="card-title">Nitrilas</h3>
+                <div class="formula">R—C≡N</div>
+                <p class="description">Caracterizadas pelo grupo cianeto com tripla ligação.</p>
+                <div class="examples">🧪 Exemplos: Acetonitrila, Acrilonitrila</div>
+            </div>
+
+            <div class="card">
+                <div class="canvas-container" id="nitro-canvas"></div>
+                <h3 class="card-title">Nitrocompostos</h3>
+                <div class="formula">R—NO₂</div>
+                <p class="description">Contêm grupos nitro ligados ao carbono.</p>
+                <div class="examples">💣 Exemplos: TNT, Nitroglicerina, Nitrobenzeno</div>
+            </div>
+        </div>
+
+        <div class="section-title">🔬 FUNÇÕES HALOGENADAS</div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="canvas-container" id="haleto-canvas"></div>
+                <h3 class="card-title">Haletos Orgânicos</h3>
+                <div class="formula">R—X (X = F, Cl, Br, I)</div>
+                <p class="description">Hidrocarbonetos com halogênios substituindo hidrogênios.</p>
+                <div class="examples">🧊 Exemplos: Clorofórmio, Teflon, PVC, DDT</div>
+            </div>
+
+            <div class="card">
+                <div class="canvas-container" id="app-canvas"></div>
+                <h3 class="card-title">Aplicações</h3>
+                <p class="description">Presentes em diversos produtos e processos industriais.</p>
+                <div class="examples">
+                    ❄️ Refrigerantes (CFCs)<br>
+                    🏭 Solventes industriais<br>
+                    🌾 Pesticidas e herbicidas<br>
+                    🔧 Polímeros (PVC, Teflon)
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="canvas-container" id="impact-canvas"></div>
+                <h3 class="card-title">Impacto Ambiental</h3>
+                <p class="description">Causam sérios problemas ecológicos e de saúde.</p>
+                <div class="examples">
+                    🌍 Destruição da camada de ozônio<br>
+                    ☠️ Bioacumulação em organismos<br>
+                    ♻️ Alta persistência no ambiente<br>
+                    ⚠️ Toxicidade elevada
+                </div>
+            </div>
+        </div>
+
+        <div class="team">
+            <h2>EQUIPE</h2>
+            <div class="team-grid">
+                <div class="member">VITOR</div>
+                <div class="member">HENRIQUE</div>
+                <div class="member">GK</div>
+                <div class="member">JOÃO</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function createMolecule(containerId, atoms, bonds) {
+            const container = document.getElementById(containerId);
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setClearColor(0x000000, 0);
+            container.appendChild(renderer.domElement);
+
+            // Luz
+            const light1 = new THREE.PointLight(0x667eea, 2, 100);
+            light1.position.set(5, 5, 5);
+            scene.add(light1);
+
+            const light2 = new THREE.PointLight(0x764ba2, 1.5, 100);
+            light2.position.set(-5, -5, 5);
+            scene.add(light2);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            // Criar átomos
+            atoms.forEach(atom => {
+                const geometry = new THREE.SphereGeometry(atom.size, 32, 32);
+                const material = new THREE.MeshPhongMaterial({
+                    color: atom.color,
+                    emissive: atom.color,
+                    emissiveIntensity: 0.3,
+                    shininess: 100
+                });
+                const sphere = new THREE.Mesh(geometry, material);
+                sphere.position.set(atom.x, atom.y, atom.z);
+                scene.add(sphere);
+
+                // Brilho
+                const glowGeometry = new THREE.SphereGeometry(atom.size * 1.3, 32, 32);
+                const glowMaterial = new THREE.MeshBasicMaterial({
+                    color: atom.color,
+                    transparent: true,
+                    opacity: 0.2
+                });
+                const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                glow.position.set(atom.x, atom.y, atom.z);
+                scene.add(glow);
+            });
+
+            // Criar ligações
+            bonds.forEach(bond => {
+                const start = new THREE.Vector3(bond.start.x, bond.start.y, bond.start.z);
+                const end = new THREE.Vector3(bond.end.x, bond.end.y, bond.end.z);
+                const direction = new THREE.Vector3().subVectors(end, start);
+                const length = direction.length();
+                
+                const geometry = new THREE.CylinderGeometry(0.08, 0.08, length, 8);
+                const material = new THREE.MeshPhongMaterial({
+                    color: 0x667eea,
+                    emissive: 0x667eea,
+                    emissiveIntensity: 0.2
+                });
+                const cylinder = new THREE.Mesh(geometry, material);
+                
+                cylinder.position.copy(start.clone().add(direction.multiplyScalar(0.5)));
+                cylinder.lookAt(end);
+                cylinder.rotateX(Math.PI / 2);
+                
+                scene.add(cylinder);
+            });
+
+            camera.position.z = 5;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                scene.rotation.y += 0.005;
+                scene.rotation.x += 0.002;
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        // Amina: NH2
+        createMolecule('amina-canvas', [
+            { x: -1, y: 0, z: 0, size: 0.4, color: 0x3498db },
+            { x: 0.5, y: 0.5, z: 0, size: 0.3, color: 0xe74c3c },
+            { x: 0.5, y: -0.5, z: 0, size: 0.3, color: 0xe74c3c }
+        ], [
+            { start: { x: -1, y: 0, z: 0 }, end: { x: 0.5, y: 0.5, z: 0 } },
+            { start: { x: -1, y: 0, z: 0 }, end: { x: 0.5, y: -0.5, z: 0 } }
+        ]);
+
+        // Amida: CONH2
+        createMolecule('amida-canvas', [
+            { x: -1.5, y: 0, z: 0, size: 0.35, color: 0x95a5a6 },
+            { x: -0.5, y: 0, z: 0, size: 0.4, color: 0xe74c3c },
+            { x: 0, y: 1, z: 0, size: 0.35, color: 0xe74c3c },
+            { x: 1, y: 0, z: 0, size: 0.4, color: 0x3498db },
+            { x: 1.8, y: 0.6, z: 0, size: 0.3, color: 0xe74c3c },
+            { x: 1.8, y: -0.6, z: 0, size: 0.3, color: 0xe74c3c }
+        ], [
+            { start: { x: -1.5, y: 0, z: 0 }, end: { x: -0.5, y: 0, z: 0 } },
+            { start: { x: -0.5, y: 0, z: 0 }, end: { x: 0, y: 1, z: 0 } },
+            { start: { x: -0.5, y: 0, z: 0 }, end: { x: 1, y: 0, z: 0 } },
+            { start: { x: 1, y: 0, z: 0 }, end: { x: 1.8, y: 0.6, z: 0 } },
+            { start: { x: 1, y: 0, z: 0 }, end: { x: 1.8, y: -0.6, z: 0 } }
+        ]);
+
+        // Nitrila: CN
+        createMolecule('nitrila-canvas', [
+            { x: -1, y: 0, z: 0, size: 0.35, color: 0x95a5a6 },
+            { x: 0, y: 0, z: 0, size: 0.4, color: 0x3498db }
+        ], [
+            { start: { x: -1, y: 0, z: 0 }, end: { x: 0, y: 0, z: 0 } }
+        ]);
+
+        // Nitrocomposto: NO2
+        createMolecule('nitro-canvas', [
+            { x: 0, y: 0, z: 0, size: 0.4, color: 0x3498db },
+            { x: 0.8, y: 0.8, z: 0, size: 0.35, color: 0xe74c3c },
+            { x: 0.8, y: -0.8, z: 0, size: 0.35, color: 0xe74c3c },
+            { x: -1.2, y: 0, z: 0, size: 0.35, color: 0x95a5a6 }
+        ], [
+            { start: { x: -1.2, y: 0, z: 0 }, end: { x: 0, y: 0, z: 0 } },
+            { start: { x: 0, y: 0, z: 0 }, end: { x: 0.8, y: 0.8, z: 0 } },
+            { start: { x: 0, y: 0, z: 0 }, end: { x: 0.8, y: -0.8, z: 0 } }
+        ]);
+
+        // Haleto: R-X
+        createMolecule('haleto-canvas', [
+            { x: -1, y: 0, z: 0, size: 0.35, color: 0x95a5a6 },
+            { x: 0.5, y: 0, z: 0, size: 0.45, color: 0x2ecc71 }
+        ], [
+            { start: { x: -1, y: 0, z: 0 }, end: { x: 0.5, y: 0, z: 0 } }
+        ]);
+
+        // Aplicações - Molécula complexa
+        createMolecule('app-canvas', [
+            { x: 0, y: 0, z: 0, size: 0.35, color: 0x95a5a6 },
+            { x: 1, y: 0.8, z: 0, size: 0.4, color: 0x2ecc71 },
+            { x: 1, y: -0.8, z: 0, size: 0.4, color: 0x2ecc71 },
+            { x: -1, y: 0.8, z: 0, size: 0.4, color: 0x2ecc71 },
+            { x: -1, y: -0.8, z: 0, size: 0.4, color: 0x2ecc71 }
+        ], [
+            { start: { x: 0, y: 0, z: 0 }, end: { x: 1, y: 0.8, z: 0 } },
+            { start: { x: 0, y: 0, z: 0 }, end: { x: 1, y: -0.8, z: 0 } },
+            { start: { x: 0, y: 0, z: 0 }, end: { x: -1, y: 0.8, z: 0 } },
+            { start: { x: 0, y: 0, z: 0 }, end: { x: -1, y: -0.8, z: 0 } }
+        ]);
+
+        // Impacto - Molécula degradada
+        createMolecule('impact-canvas', [
+            { x: 0, y: 0, z: 0, size: 0.4, color: 0xe74c3c },
+            { x: 1.2, y: 0.5, z: 0.3, size: 0.3, color: 0x2ecc71 },
+            { x: -1, y: 0.8, z: -0.2, size: 0.3, color: 0x2ecc71 },
+            { x: 0.5, y: -1.2, z: 0.5, size: 0.3, color: 0x2ecc71 },
+            { x: -0.8, y: -0.7, z: -0.4, size: 0.35, color: 0xf39c12 }
+        ], [
+            { start: { x: 0, y: 0, z: 0 }, end: { x: 1.2, y: 0.5, z: 0.3 } },
+            { start: { x: 0, y: 0, z: 0 }, end: { x: -1, y: 0.8, z: -0.2 } },
+            { start: { x: 0, y: 0, z: 0 }, end: { x: 0.5, y: -1.2, z: 0.5 } },
+            { start: { x: 0, y: 0, z: 0 }, end: { x: -0.8, y: -0.7, z: -0.4 } }
+        ]);
+    </script>
+</body>
+</html>
